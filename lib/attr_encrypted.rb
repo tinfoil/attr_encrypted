@@ -221,7 +221,7 @@ module AttrEncrypted
       value = options[:marshal] ? options[:marshaler].send(options[:dump_method], value) : value.to_s
       encrypted_value = options[:encryptor].send(options[:encrypt_method], options.merge!(:value => value))
       encrypted_value = [encrypted_value].pack(options[:encode]) if options[:encode]
-      encrypted_value
+      encrypted_value.chomp
     else
       value
     end
@@ -330,7 +330,7 @@ module AttrEncrypted
           begin
             algorithm = algorithm || "aes-256-cbc"
             algo = OpenSSL::Cipher::Cipher.new(algorithm)
-            iv = [algo.random_iv].pack("m")
+            iv = [algo.random_iv].pack("m").chomp
             send("#{encrypted_attribute_name}_iv=", iv)
           rescue RuntimeError
           end

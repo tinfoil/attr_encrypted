@@ -125,7 +125,7 @@ class LegacyAttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_encoding
-    assert_equal LegacyUser.encrypt_with_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m')
+    assert_equal LegacyUser.encrypt_with_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m').chomp
   end
 
   def test_should_decrypt_with_encoding
@@ -141,7 +141,7 @@ class LegacyAttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_custom_encoding
-    assert_equal LegacyUser.encrypt_with_custom_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m')
+    assert_equal LegacyUser.encrypt_with_custom_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m').chomp
   end
 
   def test_should_decrypt_with_custom_encoding
@@ -268,7 +268,7 @@ class LegacyAttrEncryptedTest < Test::Unit::TestCase
     @user.with_if_changed = "encrypt_stuff"
     @user.stubs(:instance_variable_get).returns(nil)
     @user.stubs(:instance_variable_set).raises("BadStuff")
-    assert_raise RuntimeError do 
+    assert_raise RuntimeError do
       @user.with_if_changed
     end
 
