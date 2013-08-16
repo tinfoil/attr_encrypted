@@ -39,8 +39,10 @@ Gem::Specification.new do |s|
   s.add_development_dependency('rake', '0.9.2.2')
   if RUBY_VERSION < '1.9.3'
     s.add_development_dependency('rcov')
+    s.add_development_dependency('mongoid', ['~> 2.7.0'])
   else
     s.add_development_dependency('simplecov')
     s.add_development_dependency('simplecov-rcov')
+    s.add_development_dependency('mongoid', ['~> 3.0'])
   end
 end
