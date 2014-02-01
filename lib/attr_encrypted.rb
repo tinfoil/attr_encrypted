@@ -78,6 +78,8 @@ module AttrEncrypted
   #
   #   :algorithm        => Algorithm for encryption/decryption. Defaults to 'aes-256-cbc'.
   #
+  #   :type             => The type to encrypt/decrypt to/from. Supported options are: Array, String (default).
+  #
   # You can specify your own default options
   #
   #   class User
@@ -121,8 +123,11 @@ module AttrEncrypted
       :encrypt_method   => 'encrypt',
       :decrypt_method   => 'decrypt',
       :mode             => :per_attribute_iv_and_salt,
-      :algorithm        => 'aes-256-cbc'
+      :algorithm        => 'aes-256-cbc',
+      :type             => String
     }.merge!(attr_encrypted_options).merge!(attributes.last.is_a?(Hash) ? attributes.pop : {})
+
+    raise ArgumentError, "Type must be one of String, Array" if ![Array, String].include?(options[:type])
 
     options[:encode] = options[:default_encoding] if options[:encode] == true
 
@@ -144,11 +149,28 @@ module AttrEncrypted
       end
 
       define_method(attribute) do
-        instance_variable_get("@#{attribute}") || instance_variable_set("@#{attribute}", decrypt(attribute, send(encrypted_attribute_name)))
+        instance_variable_get("@#{attribute}") || instance_variable_set("@#{attribute}",
+          case
+          when options[:type] == Array
+            encrypted_attributes = send(encrypted_attribute_name)
+            raise ArgumentError, "Expected an Array for decryption when :type is Array" unless encrypted_attributes.is_a?(Array)
+            encrypted_attributes.map { |encrypted_attribute| decrypt(attribute, encrypted_attribute) }
+          when options[:type] == String
+            decrypt(attribute, send(encrypted_attribute_name))
+          end
+        )
       end
 
       define_method("#{attribute}=") do |value|
-        send("#{encrypted_attribute_name}=", encrypt(attribute, value))
+        send("#{encrypted_attribute_name}=",
+          case
+          when options[:type] == Array
+            raise ArgumentError, "Expected an Array for encryption when :type is Array" unless value.is_a?(Array)
+            value.map { |val| encrypt(attribute, val) }
+          when options[:type] == String
+            encrypt(attribute, value)
+          end
+        )
         instance_variable_set("@#{attribute}", value)
       end
 
