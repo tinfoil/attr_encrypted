@@ -76,6 +76,8 @@ module AttrEncrypted
   #                        is the recommended mode for new deployments.
   #                        Defaults to <tt>:single_iv_and_salt</tt>.
   #
+  #   :algorithm        => Algorithm for encryption/decryption. Defaults to 'aes-256-cbc'.
+  #
   # You can specify your own default options
   #
   #   class User
@@ -118,7 +120,8 @@ module AttrEncrypted
       :encryptor        => Encryptor,
       :encrypt_method   => 'encrypt',
       :decrypt_method   => 'decrypt',
-      :mode             => :single_iv_and_salt
+      :mode             => :single_iv_and_salt,
+      :algorithm        => 'aes-256-cbc'
     }.merge!(attr_encrypted_options).merge!(attributes.last.is_a?(Hash) ? attributes.pop : {})
 
     options[:encode] = options[:default_encoding] if options[:encode] == true
@@ -328,13 +331,9 @@ module AttrEncrypted
         encrypted_attribute_name = self.class.encrypted_attributes[attribute.to_sym][:attribute]
         iv = send("#{encrypted_attribute_name}_iv")
         if(iv == nil)
-          begin
-            algorithm = algorithm || "aes-256-cbc"
-            algo = OpenSSL::Cipher::Cipher.new(algorithm)
-            iv = [algo.random_iv].pack("m").chomp
-            send("#{encrypted_attribute_name}_iv=", iv)
-          rescue RuntimeError
-          end
+          algo = OpenSSL::Cipher::Cipher.new(algorithm)
+          iv = [algo.random_iv].pack("m").chomp
+          send("#{encrypted_attribute_name}_iv=", iv)
         end
         self.class.encrypted_attributes[attribute.to_sym] = self.class.encrypted_attributes[attribute.to_sym].merge(:iv => iv.unpack("m").first) if (iv && !iv.empty?)
       end
