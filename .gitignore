@@ -5,3 +5,4 @@ coverage
 .bundle/*
 .ruby-version
 .ruby-gemset
+gemfiles/*.gemfile.lock
