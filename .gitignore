@@ -2,3 +2,6 @@
 pkg
 Gemfile.lock
 coverage
+.bundle/*
+.ruby-version
+.ruby-gemset
