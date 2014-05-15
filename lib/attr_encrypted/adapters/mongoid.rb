@@ -1,4 +1,4 @@
-if defined?(Sequel)
+if defined?(Mongoid)
   module AttrEncrypted
     module Adapters
       module Mongoid
@@ -12,6 +12,7 @@ if defined?(Sequel)
         def included_with_attr_encrypted(base)
           included_without_attr_encrypted(base)
           base.attr_encrypted_options[:encode] = true
+          base.attr_encrypted_options[:marshal] = true
         end
       end
     end
