@@ -27,8 +27,7 @@ Gem::Specification.new do |s|
   s.test_files = Dir['test/**/*']
 
   s.add_dependency('encryptor', ['>= 1.3.0'])
-  s.add_development_dependency 'appraisal'
-
+  s.add_development_dependency('appraisal')
   s.add_development_dependency('datamapper')
   s.add_development_dependency('mocha', '~>1.0.0')
   s.add_development_dependency('sequel')
