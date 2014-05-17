@@ -10,6 +10,8 @@ class LegacyClient
   property :encrypted_credentials, Text
   property :salt, String
 
+  self.attr_encrypted_options[:mode] = :single_iv_and_salt
+
   attr_encrypted :email, :key => 'a secret key'
   attr_encrypted :credentials, :key => Proc.new { |client| Encryptor.encrypt(:value => client.salt, :key => 'some private key') }, :marshal => true
 

@@ -13,6 +13,7 @@ end
 
 class LegacyUser
   self.attr_encrypted_options[:key] = Proc.new { |user| user.class.to_s } # default key
+  self.attr_encrypted_options[:mode] = :single_iv_and_salt
 
   attr_encrypted :email, :without_encoding, :key => 'secret key'
   attr_encrypted :password, :prefix => 'crypted_', :suffix => '_test'
