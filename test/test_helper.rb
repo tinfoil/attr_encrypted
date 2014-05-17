@@ -18,6 +18,7 @@ require 'active_record'
 require 'data_mapper'
 require 'sequel'
 require 'mocha/test_unit'
+require 'mongoid'
 
 $:.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 $:.unshift(File.dirname(__FILE__))

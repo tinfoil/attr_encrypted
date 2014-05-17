@@ -3,7 +3,7 @@
 source "http://rubygems.org"
 
 gem "encryptor", :git => "https://github.com/attr-encrypted/encryptor"
-gem "activerecord", "~> 3.0"
-gem "mongoid", "< 4"
+gem "mongoid", "~> 3.0"
+gem "activerecord", "< 4"
 
 gemspec :path => "../"

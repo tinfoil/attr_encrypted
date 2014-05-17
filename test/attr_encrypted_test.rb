@@ -29,6 +29,8 @@ class User
 
   attr_encryptor :aliased, :key => SECRET_KEY
 
+  attr_encryptor :with_array, :key => SECRET_KEY, :type => Array
+
   attr_accessor :salt
   attr_accessor :should_encrypt
 
@@ -327,4 +329,35 @@ class AttrEncryptedTest < Test::Unit::TestCase
 
     assert_equal 'test@example.com', @user1.decrypt(:email, @user1.encrypted_email)
   end
+
+  def test_should_error_on_unsupported_type
+    assert_raise ArgumentError do
+      User.class_eval do
+        attr_encryptor :unsupported, :type => Hash
+      end
+    end
+  end
+
+  def test_encrypt_array_type
+    @user = User.new
+    @user.with_array = [1,2,3]
+    assert_not_nil @user.encrypted_with_array
+    assert @user.encrypted_with_array.is_a?(Array)
+  end
+
+  def test_should_error_when_encrypting_incompatible_type
+    @user = User.new
+    assert_raise ArgumentError do
+      @user.with_array = 'foo'
+    end
+  end
+
+  def test_should_error_when_decrypting_incompatible_type
+    @user = User.new
+    @user.encrypted_with_array = 'foo'
+    assert_raise ArgumentError do
+      @user.with_array
+    end
+  end
+
 end

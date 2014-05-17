@@ -33,6 +33,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency('sequel')
   s.add_development_dependency('sqlite3')
   s.add_development_dependency('dm-sqlite-adapter')
+  s.add_development_dependency('mongoid')
   # Lock to "rake" version 0.9.2.2 in order to use deprecated "rake/rdoctask".
   # Once we drop official support for Ruby 1.8.7, we can loosen this constraint
   # and allow our dependencies to "float" to the latest version of "rake".
