@@ -46,7 +46,6 @@ if ::ActiveRecord::VERSION::STRING > "4.0"
 end
 
 class Person < ActiveRecord::Base
-  self.attr_encrypted_options[:mode] = :per_attribute_iv_and_salt
   attr_encrypted :email, :key => SECRET_KEY
   attr_encrypted :credentials, :key => Proc.new { |user| Encryptor.encrypt(:value => user.salt, :key => SECRET_KEY) }, :marshal => true
 

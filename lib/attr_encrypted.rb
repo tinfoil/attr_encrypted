@@ -120,7 +120,7 @@ module AttrEncrypted
       :encryptor        => Encryptor,
       :encrypt_method   => 'encrypt',
       :decrypt_method   => 'decrypt',
-      :mode             => :single_iv_and_salt,
+      :mode             => :per_attribute_iv_and_salt,
       :algorithm        => 'aes-256-cbc'
     }.merge!(attr_encrypted_options).merge!(attributes.last.is_a?(Hash) ? attributes.pop : {})
 
