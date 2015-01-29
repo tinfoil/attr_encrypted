@@ -4,18 +4,29 @@ if defined?(ActiveRecord::Base)
       module ActiveRecord
         def self.extended(base) # :nodoc:
           base.class_eval do
+
+            # https://github.com/attr-encrypted/attr_encrypted/issues/68
+            def reload_with_attr_encrypted(*args, &block)
+              result = reload_without_attr_encrypted(*args, &block)
+              self.class.encrypted_attributes.keys.each do |attribute_name|
+                instance_variable_set("@#{attribute_name}", nil)
+              end
+              result
+            end
+            alias_method_chain :reload, :attr_encrypted
+
             attr_encrypted_options[:encode] = true
             class << self
+              alias_method :attr_encryptor, :attr_encrypted
               alias_method_chain :method_missing, :attr_encrypted
               alias_method :undefine_attribute_methods, :reset_column_information if ::ActiveRecord::VERSION::STRING < "3"
             end
 
             def perform_attribute_assignment(method, new_attributes, *args)
               return if new_attributes.blank?
-              attributes = new_attributes.respond_to?(:with_indifferent_access) ? new_attributes.with_indifferent_access : new_attributes.symbolize_keys
-              encrypted_attributes = self.class.encrypted_attributes.keys
-              self.send method, attributes.except(*encrypted_attributes), *args
-              self.send method, attributes.slice(*encrypted_attributes), *args
+
+              send method, new_attributes.reject { |k, _|  self.class.encrypted_attributes.key?(k.to_sym) }, *args
+              send method, new_attributes.reject { |k, _| !self.class.encrypted_attributes.key?(k.to_sym) }, *args
             end
             private :perform_attribute_assignment
 
@@ -35,21 +46,25 @@ if defined?(ActiveRecord::Base)
 
         protected
 
-          # Ensures the attribute methods for db fields have been defined before calling the original 
           # <tt>attr_encrypted</tt> method
           def attr_encrypted(*attrs)
-            define_attribute_methods rescue nil
             super
-            undefine_attribute_methods
             attrs.reject { |attr| attr.is_a?(Hash) }.each { |attr| alias_method "#{attr}_before_type_cast", attr }
           end
 
-          # Allows you to use dynamic methods like <tt>find_by_email</tt> or <tt>scoped_by_email</tt> for 
+          def attribute_instance_methods_as_symbols
+            # We add accessor methods of the db columns to the list of instance
+            # methods returned to let ActiveRecord define the accessor methods
+            # for the db columns
+            columns_hash.keys.inject(super) {|instance_methods, column_name| instance_methods.concat [column_name.to_sym, :"#{column_name}="]}
+          end
+
+          # Allows you to use dynamic methods like <tt>find_by_email</tt> or <tt>scoped_by_email</tt> for
           # encrypted attributes
           #
           # NOTE: This only works when the <tt>:key</tt> option is specified as a string (see the README)
           #
-          # This is useful for encrypting fields like email addresses. Your user's email addresses 
+          # This is useful for encrypting fields like email addresses. Your user's email addresses
           # are encrypted in the database, but you can still look up a user by email for logging in
           #
           # Example

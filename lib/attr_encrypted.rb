@@ -136,7 +136,7 @@ module AttrEncrypted
       iv_name = "#{encrypted_attribute_name}_iv".to_sym
       salt_name = "#{encrypted_attribute_name}_salt".to_sym
 
-      instance_methods_as_symbols = instance_methods.collect { |method| method.to_sym }
+      instance_methods_as_symbols = attribute_instance_methods_as_symbols
       attr_reader encrypted_attribute_name unless instance_methods_as_symbols.include?(encrypted_attribute_name)
       attr_writer encrypted_attribute_name unless instance_methods_as_symbols.include?(:"#{encrypted_attribute_name}=")
 
@@ -182,6 +182,7 @@ module AttrEncrypted
       encrypted_attributes[attribute.to_sym] = options.merge(:attribute => encrypted_attribute_name)
     end
   end
+
   alias_method :attr_encryptor, :attr_encrypted
 
   # Default options to use with calls to <tt>attr_encrypted</tt>
@@ -328,7 +329,7 @@ module AttrEncrypted
 
       # Returns attr_encrypted options evaluated in the current object's scope for the attribute specified
       def evaluated_attr_encrypted_options_for(attribute)
-        if self.class.encrypted_attributes[attribute.to_sym][:mode] == :per_attribute_iv_and_salt
+        if evaluate_attr_encrypted_option(self.class.encrypted_attributes[attribute.to_sym][:mode]) == :per_attribute_iv_and_salt
           load_iv_for_attribute(attribute, self.class.encrypted_attributes[attribute.to_sym][:algorithm])
           load_salt_for_attribute(attribute)
         end
@@ -370,6 +371,13 @@ module AttrEncrypted
         self.class.encrypted_attributes[attribute.to_sym] = self.class.encrypted_attributes[attribute.to_sym].merge(:salt => salt)
       end
   end
+
+  protected
+
+  def attribute_instance_methods_as_symbols
+    instance_methods.collect { |method| method.to_sym }
+  end
+
 end
 
 Object.extend AttrEncrypted
