@@ -19,21 +19,21 @@ Encrypting attributes has never been easier:
   class User
     attr_accessor :name
     attr_encrypted :ssn, :key => 'a secret key'
-  
+
     def load
       # loads the stored data
     end
-  
+
     def save
       # saves the :name and :encrypted_ssn attributes somewhere (e.g. filesystem, database, etc)
     end
   end
-  
+
   @user = User.new
   @user.ssn = '123-45-6789'
   @user.encrypted_ssn # returns the encrypted version of :ssn
   @user.save
-  
+
   @user = User.load
   @user.ssn # decrypts :encrypted_ssn and returns '123-45-6789'
 
@@ -41,19 +41,8 @@ The <tt>attr_encrypted</tt> method is also aliased as <tt>attr_encryptor</tt> to
 
 === Adding required columns via database migration
 
-By default, <tt>attr_encrypted</tt> uses the <tt>:single_iv_and_salt</tt>
-encryption mode for compatibility with previous versions of the gem. This mode
-uses a single IV and salt for each encrypted column. Create or modify your model
-to add a column with the <tt>encrypted_</tt> prefix (which can be modified, see
-below), e.g. <tt>encrypted_ssn</tt> via a migration like the following:
-
-  create_table :users do |t|
-    t.string :name
-    t.string :encrypted_ssn
-    t.timestamps
-  end
-
-For enhanced security, you can use the <tt>:per_attribute_iv_and_salt</tt> mode.
+By default, <tt>attr_encrypted</tt> uses the <tt>:per_attribute_iv_and_salt</tt>
+encryption mode for enhanced security.
 This requires additional <tt>_salt</tt> and <tt>_iv</tt> columns with the
 <tt>encrypted_</tt> prefix as follows and generates a unique salt and IV per
 attribute:
@@ -67,12 +56,24 @@ attribute:
     t.timestamps
   end
 
-This mode is enabled by specifying a value of <tt>:per_attribute_iv_and_salt</tt>
+For compatibility, <tt>attr_encrypted</tt> can use the <tt>:single_iv_and_salt</tt>
+encryption mode. This mode uses a single IV and salt for each encrypted column.
+Create or modify your model to add a column with the <tt>encrypted_</tt> prefix
+(which can be modified, see below), e.g. <tt>encrypted_ssn</tt> via a migration
+like the following:
+
+  create_table :users do |t|
+    t.string :name
+    t.string :encrypted_ssn
+    t.timestamps
+  end
+
+This mode is enabled by specifying a value of <tt>:single_iv_and_salt</tt>
 via the <tt>:mode</tt> option as follows:
 
   class User
     attr_accessor :name
-    attr_encrypted :ssn, :key => 'a secret key', :mode => :per_attribute_iv_and_salt
+    attr_encrypted :ssn, :key => 'a secret key', :mode => :single_iv_and_salt
   end
 
 Note that there are alternatives to storing the IV and salt in separate columns:
@@ -130,7 +131,7 @@ If your class has an instance method that determines the encryption key to use, 
 
   class User
     attr_encrypted :email, :key => :encryption_key
-  
+
     def encryption_key
       # does some fancy logic and returns an encryption key
     end
@@ -150,7 +151,7 @@ This can be used to create asymmetrical encryption by requiring users to provide
 
 === Conditional encrypting
 
-There may be times that you want to only encrypt when certain conditions are met. For example maybe you're using rails and you don't want to encrypt 
+There may be times that you want to only encrypt when certain conditions are met. For example maybe you're using rails and you don't want to encrypt
 attributes when you're in development mode. You can specify conditions like this:
 
   class User < ActiveRecord::Base
@@ -171,7 +172,7 @@ Lets suppose you'd like to use this custom encryptor class:
     def self.silly_encrypt(options)
       (options[:value] + options[:secret_key]).reverse
     end
-  
+
     def self.silly_decrypt(options)
       options[:value].reverse.gsub(/#{options[:secret_key]}$/, '')
     end
