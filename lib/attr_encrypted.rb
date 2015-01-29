@@ -153,8 +153,12 @@ module AttrEncrypted
           case
           when options[:type] == Array
             encrypted_attributes = send(encrypted_attribute_name)
-            raise ArgumentError, "Expected an Array for decryption when :type is Array" unless encrypted_attributes.is_a?(Array)
-            encrypted_attributes.map { |encrypted_attribute| decrypt(attribute, encrypted_attribute) }
+            if encrypted_attributes.nil?
+              encrypted_attributes
+            else
+              raise ArgumentError, "Expected an Array for decryption when :type is Array" unless encrypted_attributes.is_a?(Array)
+              encrypted_attributes.map { |encrypted_attribute| decrypt(attribute, encrypted_attribute) }
+            end
           when options[:type] == String
             decrypt(attribute, send(encrypted_attribute_name))
           end
@@ -165,8 +169,12 @@ module AttrEncrypted
         send("#{encrypted_attribute_name}=",
           case
           when options[:type] == Array
-            raise ArgumentError, "Expected an Array for encryption when :type is Array" unless value.is_a?(Array)
-            value.map { |val| encrypt(attribute, val) }
+            if value.nil?
+              value
+            else
+              raise ArgumentError, "Expected an Array for encryption when :type is Array" unless value.is_a?(Array)
+              value.map { |val| encrypt(attribute, val) }
+            end
           when options[:type] == String
             encrypt(attribute, value)
           end

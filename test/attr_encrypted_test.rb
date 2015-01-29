@@ -345,6 +345,12 @@ class AttrEncryptedTest < Test::Unit::TestCase
     assert @user.encrypted_with_array.is_a?(Array)
   end
 
+  def test_nil_array_type
+    @user = User.new
+    @user.with_array = nil
+    assert_nil @user.encrypted_with_array
+  end
+
   def test_should_error_when_encrypting_incompatible_type
     @user = User.new
     assert_raise ArgumentError do
