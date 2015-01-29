@@ -33,9 +33,8 @@ end
 
 appraise 'activerecord-4.0-mongoid-4.0' do
   gem 'activerecord', '~> 4.0'
-  gem 'actionpack', '~> 4.0'
   gem 'minitest', '< 5' # test/user and minitest > 5 are incompatible
-  gem 'mongoid', '~> 4.0.0.beta1'
+  gem 'mongoid', '~> 4.0'
 end
 
 appraise 'mongoid-3.0' do
