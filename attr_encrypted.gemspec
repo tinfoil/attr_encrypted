@@ -28,14 +28,8 @@ Gem::Specification.new do |s|
 
   s.add_dependency('encryptor', ['>= 1.3.0'])
 
-  # support for testing with specific active record version
-  activerecord_version = if ENV.key?('ACTIVERECORD')
-    "~> #{ENV['ACTIVERECORD']}"
-  else
-    ['>= 2.0.0']
-  end
-  s.add_development_dependency('activerecord', activerecord_version)
-  s.add_development_dependency('actionpack', activerecord_version)
+  s.add_development_dependency('activerecord', '>= 2.0.0')
+  s.add_development_dependency('actionpack', '>= 2.0.0')
   s.add_development_dependency('datamapper')
   s.add_development_dependency('mocha', '~> 1.0.0')
   s.add_development_dependency('sequel')
