@@ -53,6 +53,7 @@ if defined?(ActiveRecord::Base)
           end
 
           def attribute_instance_methods_as_symbols
+            return [] unless table_exists?
             # We add accessor methods of the db columns to the list of instance
             # methods returned to let ActiveRecord define the accessor methods
             # for the db columns
