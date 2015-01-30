@@ -248,7 +248,7 @@ module AttrEncrypted
       value = options[:marshal] ? options[:marshaler].send(options[:dump_method], value) : value.to_s
       encrypted_value = options[:encryptor].send(options[:encrypt_method], options.merge!(:value => value))
       encrypted_value = [encrypted_value].pack(options[:encode]) if options[:encode]
-      encrypted_value.chomp
+      encrypted_value
     else
       value
     end

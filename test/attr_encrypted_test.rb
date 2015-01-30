@@ -131,7 +131,7 @@ class AttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_encoding
-    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m').chomp
+    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m')
   end
 
   def test_should_decrypt_with_encoding
@@ -141,7 +141,7 @@ class AttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_custom_encoding
-    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m').chomp
+    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m')
   end
 
   def test_should_decrypt_with_custom_encoding
