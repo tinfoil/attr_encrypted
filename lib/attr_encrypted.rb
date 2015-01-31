@@ -136,7 +136,7 @@ module AttrEncrypted
       iv_name = "#{encrypted_attribute_name}_iv".to_sym
       salt_name = "#{encrypted_attribute_name}_salt".to_sym
 
-      instance_methods_as_symbols = instance_methods.collect { |method| method.to_sym }
+      instance_methods_as_symbols = attribute_instance_methods_as_symbols
       attr_reader encrypted_attribute_name unless instance_methods_as_symbols.include?(encrypted_attribute_name)
       attr_writer encrypted_attribute_name unless instance_methods_as_symbols.include?(:"#{encrypted_attribute_name}=")
 
@@ -153,8 +153,12 @@ module AttrEncrypted
           case
           when options[:type] == Array
             encrypted_attributes = send(encrypted_attribute_name)
-            raise ArgumentError, "Expected an Array for decryption when :type is Array" unless encrypted_attributes.is_a?(Array)
-            encrypted_attributes.map { |encrypted_attribute| decrypt(attribute, encrypted_attribute) }
+            if encrypted_attributes.nil?
+              encrypted_attributes
+            else
+              raise ArgumentError, "Expected an Array for decryption when :type is Array" unless encrypted_attributes.is_a?(Array)
+              encrypted_attributes.map { |encrypted_attribute| decrypt(attribute, encrypted_attribute) }
+            end
           when options[:type] == String
             decrypt(attribute, send(encrypted_attribute_name))
           end
@@ -165,8 +169,12 @@ module AttrEncrypted
         send("#{encrypted_attribute_name}=",
           case
           when options[:type] == Array
-            raise ArgumentError, "Expected an Array for encryption when :type is Array" unless value.is_a?(Array)
-            value.map { |val| encrypt(attribute, val) }
+            if value.nil?
+              value
+            else
+              raise ArgumentError, "Expected an Array for encryption when :type is Array" unless value.is_a?(Array)
+              value.map { |val| encrypt(attribute, val) }
+            end
           when options[:type] == String
             encrypt(attribute, value)
           end
@@ -182,6 +190,7 @@ module AttrEncrypted
       encrypted_attributes[attribute.to_sym] = options.merge(:attribute => encrypted_attribute_name)
     end
   end
+
   alias_method :attr_encryptor, :attr_encrypted
 
   # Default options to use with calls to <tt>attr_encrypted</tt>
@@ -247,7 +256,7 @@ module AttrEncrypted
       value = options[:marshal] ? options[:marshaler].send(options[:dump_method], value) : value.to_s
       encrypted_value = options[:encryptor].send(options[:encrypt_method], options.merge!(:value => value))
       encrypted_value = [encrypted_value].pack(options[:encode]) if options[:encode]
-      encrypted_value.chomp
+      encrypted_value
     else
       value
     end
@@ -328,7 +337,7 @@ module AttrEncrypted
 
       # Returns attr_encrypted options evaluated in the current object's scope for the attribute specified
       def evaluated_attr_encrypted_options_for(attribute)
-        if self.class.encrypted_attributes[attribute.to_sym][:mode] == :per_attribute_iv_and_salt
+        if evaluate_attr_encrypted_option(self.class.encrypted_attributes[attribute.to_sym][:mode]) == :per_attribute_iv_and_salt
           load_iv_for_attribute(attribute, self.class.encrypted_attributes[attribute.to_sym][:algorithm])
           load_salt_for_attribute(attribute)
         end
@@ -370,6 +379,13 @@ module AttrEncrypted
         self.class.encrypted_attributes[attribute.to_sym] = self.class.encrypted_attributes[attribute.to_sym].merge(:salt => salt)
       end
   end
+
+  protected
+
+  def attribute_instance_methods_as_symbols
+    instance_methods.collect { |method| method.to_sym }
+  end
+
 end
 
 Object.extend AttrEncrypted

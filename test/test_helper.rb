@@ -1,16 +1,15 @@
-if RUBY_VERSION >= '1.9.3'
-  require 'simplecov'
-  require 'simplecov-rcov'
+require 'simplecov'
+require 'simplecov-rcov'
 
-  SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
-    SimpleCov::Formatter::HTMLFormatter,
-    SimpleCov::Formatter::RcovFormatter,
-  ]
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  SimpleCov::Formatter::HTMLFormatter,
+  SimpleCov::Formatter::RcovFormatter,
+]
 
-  SimpleCov.start do
-    add_filter 'test'
-  end
+SimpleCov.start do
+  add_filter 'test'
 end
+
 
 require 'test/unit'
 require 'digest/sha2'
@@ -33,4 +32,3 @@ DB = Sequel.sqlite
 Sequel::Model.plugin :after_initialize
 
 SECRET_KEY = 4.times.map { Digest::SHA256.hexdigest((Time.now.to_i * rand(5)).to_s) }.join
-

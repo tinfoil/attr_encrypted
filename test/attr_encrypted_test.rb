@@ -131,7 +131,7 @@ class AttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_encoding
-    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m').chomp
+    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m')
   end
 
   def test_should_decrypt_with_encoding
@@ -141,7 +141,7 @@ class AttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_custom_encoding
-    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m').chomp
+    assert_equal User.encrypt_with_encoding('test'), [User.encrypt_without_encoding('test')].pack('m')
   end
 
   def test_should_decrypt_with_custom_encoding
@@ -343,6 +343,12 @@ class AttrEncryptedTest < Test::Unit::TestCase
     @user.with_array = [1,2,3]
     assert_not_nil @user.encrypted_with_array
     assert @user.encrypted_with_array.is_a?(Array)
+  end
+
+  def test_nil_array_type
+    @user = User.new
+    @user.with_array = nil
+    assert_nil @user.encrypted_with_array
   end
 
   def test_should_error_when_encrypting_incompatible_type

@@ -126,7 +126,7 @@ class LegacyAttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_encoding
-    assert_equal LegacyUser.encrypt_with_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m').chomp
+    assert_equal LegacyUser.encrypt_with_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m')
   end
 
   def test_should_decrypt_with_encoding
@@ -142,7 +142,7 @@ class LegacyAttrEncryptedTest < Test::Unit::TestCase
   end
 
   def test_should_encrypt_with_custom_encoding
-    assert_equal LegacyUser.encrypt_with_custom_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m').chomp
+    assert_equal LegacyUser.encrypt_with_custom_encoding('test'), [LegacyUser.encrypt_without_encoding('test')].pack('m')
   end
 
   def test_should_decrypt_with_custom_encoding
